@@ -1,0 +1,53 @@
+# Play 1 : Write a play to deploy Apache Webservers
+- name: Configure Apache Web Servers on Ubuntu and Amazon Linux 2 Clients
+  hosts: AnsibleUbuntuClients
+  remote_user: root
+
+  tasks:
+  - name: Update all packages to their latest version # i.e yum intall -y
+    apt:
+      name: '*'
+      state: latest
+  
+  - name: Install the latest version of Apache # i.e. yum install httpd -y
+    apt:
+      name: apache2
+      state: latest
+  
+  - name: Start service httpd, if not started # i.e. systemctl start httpd
+    ansible.builtin.service:
+      name: apache2
+      state: started
+
+  - name: Enable service httpd, and not touch the state # i.e. systemctl enable httpd
+    ansible.builtin.service:
+      name: apache2
+      enabled: yes    
+  
+  - name: Copy index.html file from the controler to the client
+    ansible.builtin.copy:
+      src: /home/ubuntu/index.html # from the controler
+      dest: /var/www/html/ # to the clients
+  - name: Copy emoji file from the controler to the client
+  ansible.builtin.copy:
+    src: /home/ubuntu/index_files # from the controler
+    dest: /var/www/html/ # to the clients 
+
+# Play 2: Write a play to install Git on Ubuntu Clients
+- name: Install Git on Ubuntu Clients
+  hosts: AnsibleUbuntuClients
+  remote_user: root
+
+  tasks:
+  - name: Update repository
+    apt_repository:
+       repo: 'ppa:git-core/ppa'
+       state: present
+       update_cache: yes
+  - name: Install git on Ubuntu Clients
+    apt:
+      name: git
+      state: latest
+      update_cache: yes
+
+# By MrDC
